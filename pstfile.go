@@ -13,7 +13,7 @@ type PSTFile struct {
 	Path string
 }
 
-// Reads the PST file header.
+// The file header common to both the 32-bit and 64-bit PFF format consists of 24 bytes.
 func ReadFileHeader(pstFile PSTFile) []byte {
 	inputFile, err := os.Open(pstFile.Path)
 
@@ -21,7 +21,7 @@ func ReadFileHeader(pstFile PSTFile) []byte {
 		log.Fatalf("Failed to open file: %s", pstFile.Path)
 	}
 
-	outputBuffer := make([]byte, 16)
+	outputBuffer := make([]byte, 24)
 	count, err := inputFile.Read(outputBuffer)
 
 	if err != nil {
