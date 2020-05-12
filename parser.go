@@ -17,5 +17,15 @@ func main() {
 		log.Fatalf("Invalid file signature!")
 	}
 
-	log.Printf("File signature validated...")
+	fileContentType := ReadContentType(fileHeader)
+
+	if fileContentType == ContentTypePST {
+		log.Println("Identified as Personal Storage Table (PST).")
+	} else if fileContentType == ContentTypeOST {
+		log.Println("Identified as Offline Storage Table (OST).")
+	} else if fileContentType == ContentTypePAB {
+		log.Println("Identified as Public Address Book (PAB).")
+	} else {
+		log.Fatalf("Failed to identify content type.")
+	}
 }

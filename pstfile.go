@@ -31,7 +31,20 @@ func ReadFileHeader(pstFile PSTFile) []byte {
 	return outputBuffer
 }
 
-// Returns true if the given file signature matches "!BDN" (signifying the PFF format).
+// The first 4 bytes of the file header contain the unique signature "!BDN" signifying the PFF format.
 func IsValidSignature(fileHeader []byte) bool {
 	return bytes.HasPrefix(fileHeader, []byte("!BDN"))
+}
+
+// Constants for identifying content types.
+const (
+	ContentTypePST = "SM"
+	ContentTypeOST = "SO"
+	ContentTypePAB = "AB"
+)
+
+// The 9th and 10th byte of the file header contains the content type.
+// The content type signifies if the file contains the PST, OST or PAB format.
+func ReadContentType(fileHeader []byte) string {
+	return string(fileHeader[8:10])
 }
