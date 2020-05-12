@@ -14,7 +14,7 @@ type PSTFile struct {
 }
 
 // The file header common to both the 32-bit and 64-bit PFF format consists of 24 bytes.
-func ReadFileHeader(pstFile PSTFile) []byte {
+func ReadHeader(pstFile PSTFile) []byte {
 	inputFile, err := os.Open(pstFile.Path)
 
 	if err != nil {
@@ -72,6 +72,31 @@ func ReadFormatType(fileHeader []byte) string {
 	} else if bytes.Equal(formatType, []byte{36, 0}) {
 		return FormatType64
 	} else {
-		return "UNKNOWN"
+		return "unknown"
 	}
+}
+
+// The file header data bytes size may be 540 (64-bit) or 488 (32-bit).
+func ReadHeaderData(pstFile PSTFile, formatType string) []byte {
+	inputFile, err := os.Open(pstFile.Path)
+
+	if err != nil {
+		log.Fatalf("Failed to open file: %s", pstFile.Path)
+	}
+
+	outputBufferSize := 540
+
+	// 32-bit
+	if formatType == FormatType32 {
+		outputBufferSize = 488
+	}
+
+	outputBuffer := make([]byte, outputBufferSize)
+	count, err := inputFile.Read(outputBuffer)
+
+	if err != nil {
+		log.Fatalf("Failed to read file (%d of %d bytes read).", count, outputBufferSize)
+	}
+
+	return outputBuffer
 }

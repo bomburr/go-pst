@@ -11,7 +11,7 @@ func main() {
 	log.Printf("Starting go-pst v%s...", version)
 	log.Printf("Using file: %s...", pstFile.Path)
 
-	fileHeader := ReadFileHeader(pstFile)
+	fileHeader := ReadHeader(pstFile)
 
 	if !IsValidSignature(fileHeader) {
 		log.Fatalf("Invalid file signature!")
@@ -38,4 +38,8 @@ func main() {
 	} else {
 		log.Fatalf("Failed to identify format type.")
 	}
+
+	fileHeaderData := ReadHeaderData(pstFile, fileFormatType)
+
+	log.Printf("Read file header data with %d bytes.", len(fileHeaderData))
 }
