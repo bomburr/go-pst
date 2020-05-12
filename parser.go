@@ -9,6 +9,13 @@ func main() {
 	pstFile := PSTFile{"/home/bot/Documents/test.pst"}
 
 	log.Printf("Starting go-pst v%s...", version)
-	log.Printf("Using PST file: %s...", pstFile.Path)
-	log.Printf("Validating file...")
+	log.Printf("Using file: %s...", pstFile.Path)
+
+	fileHeader := ReadFileHeader(pstFile)
+
+	if !IsValidSignature(fileHeader) {
+		log.Fatalf("Invalid file signature!")
+	}
+
+	log.Printf("File signature validated...")
 }
