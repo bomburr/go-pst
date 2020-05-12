@@ -26,6 +26,13 @@
 The PFF (Personal Folder File) and OFF (Offline Folder File) format is used to store Microsoft Outlook e-mails, appointments and contacts. 
 The PST (Personal Storage Table), OST (Offline Storage Table) and PAB (Personal Address Book) file format consist of the PFF format.
 
+## References
+
+Many thanks to the maintainers of these projects for helping me create this library.
+
+- [java-libpst](https://github.com/rjohnsondev/java-libpst)
+- [libpff](https://github.com/libyal/libpff)
+
 ## License
 
 [MIT](https://github.com/mooijtech/go-pst/blob/master/LICENSE.txt)
