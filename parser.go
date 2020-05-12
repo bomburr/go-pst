@@ -28,4 +28,14 @@ func main() {
 	} else {
 		log.Fatalf("Failed to identify content type.")
 	}
+
+	fileFormatType := ReadFormatType(fileHeader)
+
+	if fileFormatType == FormatType64 {
+		log.Println("Identified as 64-bit (Unicode).")
+	} else if fileFormatType == FormatType32 {
+		log.Println("Identified as 32-bit (ANSI).")
+	} else {
+		log.Fatalf("Failed to identify format type.")
+	}
 }

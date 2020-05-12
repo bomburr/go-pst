@@ -36,7 +36,7 @@ func IsValidSignature(fileHeader []byte) bool {
 	return bytes.HasPrefix(fileHeader, []byte("!BDN"))
 }
 
-// Constants for identifying content types.
+// Constants for identifying content types (PST, OST or PAB).
 const (
 	ContentTypePST = "SM"
 	ContentTypeOST = "SO"
@@ -47,4 +47,31 @@ const (
 // The content type signifies if the file contains the PST, OST or PAB format.
 func ReadContentType(fileHeader []byte) string {
 	return string(fileHeader[8:10])
+}
+
+// Constants for identifying format types (32-bit or 64-bit).
+const (
+	FormatType32 = "32"
+	FormatType64 = "64"
+)
+
+// The 11th and 12th byte of the file header contains the format type.
+// This can be either 32-bit (ANSI) or 64-bit (Unicode).
+func ReadFormatType(fileHeader []byte) string {
+	formatType := fileHeader[10:12]
+
+	// Values from "2.2. Format types"
+	if bytes.Equal(formatType, []byte{14, 0}) {
+		return FormatType32
+	} else if bytes.Equal(formatType, []byte{15, 0}) {
+		return FormatType32
+	} else if bytes.Equal(formatType, []byte{21, 0}) {
+		return FormatType64
+	} else if bytes.Equal(formatType, []byte{23, 0}) {
+		return FormatType64
+	} else if bytes.Equal(formatType, []byte{36, 0}) {
+		return FormatType64
+	} else {
+		return "UNKNOWN"
+	}
 }
