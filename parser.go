@@ -20,11 +20,11 @@ func main() {
 	fileContentType := ReadContentType(fileHeader)
 
 	if fileContentType == ContentTypePST {
-		log.Println("Identified as Personal Storage Table (PST).")
+		log.Println("Identified content type as Personal Storage Table (PST).")
 	} else if fileContentType == ContentTypeOST {
-		log.Println("Identified as Offline Storage Table (OST).")
+		log.Println("Identified content type as Offline Storage Table (OST).")
 	} else if fileContentType == ContentTypePAB {
-		log.Println("Identified as Public Address Book (PAB).")
+		log.Println("Identified content type as Public Address Book (PAB).")
 	} else {
 		log.Fatalf("Failed to identify content type.")
 	}
@@ -32,14 +32,23 @@ func main() {
 	fileFormatType := ReadFormatType(fileHeader)
 
 	if fileFormatType == FormatType64 {
-		log.Println("Identified as 64-bit (Unicode).")
+		log.Println("Identified format type as 64-bit (Unicode).")
 	} else if fileFormatType == FormatType32 {
-		log.Println("Identified as 32-bit (ANSI).")
+		log.Println("Identified format type as 32-bit (ANSI).")
 	} else {
 		log.Fatalf("Failed to identify format type.")
 	}
 
 	fileHeaderData := ReadHeaderData(pstFile, fileFormatType)
+	fileEncryptionType := ReadEncryptionType(fileHeaderData)
 
-	log.Printf("Read file header data with %d bytes.", len(fileHeaderData))
+	if fileEncryptionType == EncryptionTypeNone {
+		log.Println("Identified encryption type as none.")
+	} else if fileEncryptionType == EncryptionTypePermute {
+		log.Println("Identified encryption type as permute.")
+	} else if fileEncryptionType == EncryptionTypeCyclic {
+		log.Println("Identified encryption type as cyclic.")
+	} else {
+		log.Fatal("Failed to identify encryption type.")
+	}
 }

@@ -100,3 +100,31 @@ func ReadHeaderData(pstFile PSTFile, formatType string) []byte {
 
 	return outputBuffer
 }
+
+// Constants for identifying encryption types.
+const (
+	EncryptionTypeNone = "none"
+	EncryptionTypePermute = "permute"
+	EncryptionTypeCyclic = "cyclic"
+)
+
+// Reads the encryption type.
+// Compressible encryption (permute) is on by default with newer versions of Outlook.
+func ReadEncryptionType(fileHeaderData []byte) string {
+	encryptionType := fileHeaderData[513:514]
+
+	// 32-bit
+	if len(fileHeaderData) == 488 {
+		encryptionType = fileHeaderData[461:462]
+	}
+
+	if bytes.Equal(encryptionType, []byte{0}) {
+		return EncryptionTypeNone
+	} else if bytes.Equal(encryptionType, []byte{1}) {
+		return EncryptionTypePermute
+	} else if bytes.Equal(encryptionType, []byte{2}) {
+		return EncryptionTypeCyclic
+	} else {
+		return "unknown"
+	}
+}
