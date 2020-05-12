@@ -23,6 +23,8 @@
 ---
 
 #### This library doesn't work yet.
+The PFF (Personal Folder File) and OFF (Offline Folder File) format is used to store Microsoft Outlook e-mails, appointments and contacts. 
+The PST (Personal Storage Table), OST (Offline Storage Table) and PAB (Personal Address Book) file format consist of the PFF format.
 
 ## License
 
