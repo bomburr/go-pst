@@ -41,6 +41,10 @@ And constructed with the following guidelines:
 
 For more information on SemVer, please visit: https://semver.org/
 
+## Documentation
+
+[File format specification](https://github.com/mooijtech/go-pst/tree/master/docs)
+
 ## References
 
 - [java-libpst](https://github.com/rjohnsondev/java-libpst)
