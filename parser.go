@@ -5,19 +5,18 @@ package main
 import "log"
 
 func main() {
-	version := "0.0.1"
-	pstFile := PSTFile{"/home/bot/Documents/test.pst"}
+	pstFile := NewPSTFile("/home/bot/Documents/test.pst")
 
 	log.Printf("Starting go-pst v%s...", version)
 	log.Printf("Using file: %s...", pstFile.Path)
 
-	fileHeader := ReadHeader(pstFile)
+	fileHeader := pstFile.ReadHeader()
 
-	if !IsValidSignature(fileHeader) {
+	if !pstFile.IsValidSignature(fileHeader) {
 		log.Fatalf("Invalid file signature!")
 	}
 
-	fileContentType := ReadContentType(fileHeader)
+	fileContentType := pstFile.ReadContentType(fileHeader)
 
 	if fileContentType == ContentTypePST {
 		log.Println("Identified content type as Personal Storage Table (PST).")
@@ -29,7 +28,7 @@ func main() {
 		log.Fatalf("Failed to identify content type.")
 	}
 
-	fileFormatType := ReadFormatType(fileHeader)
+	fileFormatType := pstFile.ReadFormatType(fileHeader)
 
 	if fileFormatType == FormatType64 {
 		log.Println("Identified format type as 64-bit (Unicode).")
@@ -39,8 +38,8 @@ func main() {
 		log.Fatalf("Failed to identify format type.")
 	}
 
-	fileHeaderData := ReadHeaderData(pstFile, fileFormatType)
-	fileEncryptionType := ReadEncryptionType(fileHeaderData)
+	fileHeaderData := pstFile.ReadHeaderData(fileFormatType)
+	fileEncryptionType := pstFile.ReadEncryptionType(fileHeaderData)
 
 	if fileEncryptionType == EncryptionTypeNone {
 		log.Println("Identified encryption type as none.")

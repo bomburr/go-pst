@@ -13,8 +13,15 @@ type PSTFile struct {
 	Path string
 }
 
+// Constructor for creating PST files.
+func NewPSTFile(pstFilePath string) PSTFile {
+	return PSTFile {
+		Path: pstFilePath,
+	}
+}
+
 // The file header common to both the 32-bit and 64-bit PFF format consists of 24 bytes.
-func ReadHeader(pstFile PSTFile) []byte {
+func (pstFile *PSTFile) ReadHeader() []byte {
 	inputFile, err := os.Open(pstFile.Path)
 
 	if err != nil {
@@ -32,7 +39,7 @@ func ReadHeader(pstFile PSTFile) []byte {
 }
 
 // The first 4 bytes of the file header contain the unique signature "!BDN" signifying the PFF format.
-func IsValidSignature(fileHeader []byte) bool {
+func (pstFile *PSTFile) IsValidSignature(fileHeader []byte) bool {
 	return bytes.HasPrefix(fileHeader, []byte("!BDN"))
 }
 
@@ -45,7 +52,7 @@ const (
 
 // The 9th and 10th byte of the file header contains the content type.
 // The content type signifies if the file contains the PST, OST or PAB format.
-func ReadContentType(fileHeader []byte) string {
+func (pstFile *PSTFile) ReadContentType(fileHeader []byte) string {
 	return string(fileHeader[8:10])
 }
 
@@ -57,7 +64,7 @@ const (
 
 // The 11th and 12th byte of the file header contains the format type.
 // This can be either 32-bit (ANSI) or 64-bit (Unicode).
-func ReadFormatType(fileHeader []byte) string {
+func (pstFile *PSTFile) ReadFormatType(fileHeader []byte) string {
 	formatType := fileHeader[10:12]
 
 	// Values from "2.2. Format types"
@@ -77,7 +84,7 @@ func ReadFormatType(fileHeader []byte) string {
 }
 
 // The file header data bytes size may be 540 (64-bit) or 488 (32-bit).
-func ReadHeaderData(pstFile PSTFile, formatType string) []byte {
+func (pstFile *PSTFile) ReadHeaderData(formatType string) []byte {
 	inputFile, err := os.Open(pstFile.Path)
 
 	if err != nil {
@@ -110,7 +117,7 @@ const (
 
 // Reads the encryption type.
 // Compressible encryption (permute) is on by default with newer versions of Outlook.
-func ReadEncryptionType(fileHeaderData []byte) string {
+func (pstFile *PSTFile) ReadEncryptionType(fileHeaderData []byte) string {
 	encryptionType := fileHeaderData[513:514]
 
 	// 32-bit
