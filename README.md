@@ -9,17 +9,17 @@
 <h4 align="center">A fast library for reading PFF/OFF/PST/OST/PAB files in Go (Golang).</h4>
 
 <p align="center">
-  <a href="https://github.com/mooijtech/go-pst/blob/master/LICENSE.txt">
-      <img src="https://img.shields.io/badge/license-MIT-199473?style=flat-square">
+  <a href="https://github.com/mooijtech/go-pst/blob/master/LICENSE.txt" target="_blank">
+      <img src="https://img.shields.io/badge/license-MIT-199473?style=flat-square" alt="License">
   </a>
-  <a href="https://github.com/mooijtech/go-pst">
-    <img src="https://img.shields.io/badge/version-0.0.1-4D7CFE?style=flat-square">
+  <a href="https://github.com/mooijtech/go-pst" target="_blank">
+    <img src="https://img.shields.io/badge/version-0.0.1-4D7CFE?style=flat-square" alt="Version">
   </a>
-  <a href="https://travis-ci.org/github/mooijtech/go-pst">
-    <img src="https://travis-ci.org/mooijtech/go-pst.svg?branch=master">
+  <a href="https://travis-ci.org/github/mooijtech/go-pst" target="_blank">
+    <img src="https://img.shields.io/travis/mooijtech/go-pst/master?style=flat-square" alt="Build">
   </a>
-  <a href="https://github.com/mooijtech/go-pst">
-      <img src="https://img.shields.io/badge/contributions-welcome-9446ED?style=flat-square">
+  <a href="https://github.com/mooijtech/go-pst" target="_blank">
+      <img src="https://img.shields.io/badge/contributions-welcome-9446ED?style=flat-square" alt="Contributions">
   </a>
 </p>
 
@@ -43,6 +43,10 @@ And constructed with the following guidelines:
 - Bug fixes and misc changes bump the patch
 
 For more information on SemVer, please visit: https://semver.org/
+
+## Issues
+
+Feel free to submit any issues or feature requests [here](https://github.com/mooijtech/go-pst/issues).
 
 ## Documentation
 
