@@ -4,6 +4,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"log"
 	"os"
 )
@@ -21,7 +22,7 @@ func NewPSTFile(pstFilePath string) PSTFile {
 }
 
 // The file header common to both the 32-bit and 64-bit PFF format consists of 24 bytes.
-func (pstFile *PSTFile) ReadHeader() []byte {
+func (pstFile *PSTFile) GetHeader() []byte {
 	inputFile, err := os.Open(pstFile.Path)
 
 	if err != nil {
@@ -32,7 +33,7 @@ func (pstFile *PSTFile) ReadHeader() []byte {
 	count, err := inputFile.Read(outputBuffer)
 
 	if err != nil {
-		log.Fatalf("Failed to read file (%d of 16 bytes read).", count)
+		log.Fatalf("Failed to read file (%d of 24 bytes read).", count)
 	}
 
 	return outputBuffer
@@ -52,7 +53,7 @@ const (
 
 // The 9th and 10th byte of the file header contains the content type.
 // The content type signifies if the file contains the PST, OST or PAB format.
-func (pstFile *PSTFile) ReadContentType(fileHeader []byte) string {
+func (pstFile *PSTFile) GetContentType(fileHeader []byte) string {
 	return string(fileHeader[8:10])
 }
 
@@ -64,7 +65,7 @@ const (
 
 // The 11th and 12th byte of the file header contains the format type.
 // This can be either 32-bit (ANSI) or 64-bit (Unicode).
-func (pstFile *PSTFile) ReadFormatType(fileHeader []byte) string {
+func (pstFile *PSTFile) GetFormatType(fileHeader []byte) string {
 	formatType := fileHeader[10:12]
 
 	// Values from "2.2. Format types"
@@ -84,7 +85,7 @@ func (pstFile *PSTFile) ReadFormatType(fileHeader []byte) string {
 }
 
 // The file header data bytes size may be 540 (64-bit) or 488 (32-bit).
-func (pstFile *PSTFile) ReadHeaderData(formatType string) []byte {
+func (pstFile *PSTFile) GetHeaderData(formatType string) []byte {
 	inputFile, err := os.Open(pstFile.Path)
 
 	if err != nil {
@@ -117,7 +118,7 @@ const (
 
 // Reads the encryption type.
 // Compressible encryption (permute) is on by default with newer versions of Outlook.
-func (pstFile *PSTFile) ReadEncryptionType(fileHeaderData []byte) string {
+func (pstFile *PSTFile) GetEncryptionType(fileHeaderData []byte) string {
 	encryptionType := fileHeaderData[513:514]
 
 	// 32-bit
@@ -133,5 +134,14 @@ func (pstFile *PSTFile) ReadEncryptionType(fileHeaderData []byte) string {
 		return EncryptionTypeCyclic
 	} else {
 		return "unknown"
+	}
+}
+
+// Returns the offset where the b-tree starts.
+func (pstFile *PSTFile) GetBTreeStartOffset(fileHeaderData []byte) int {
+	if pstFile.GetFormatType(fileHeaderData) == FormatType64 {
+		return int(binary.LittleEndian.Uint64(fileHeaderData[240:248]))
+	} else {
+		return int(binary.LittleEndian.Uint32(fileHeaderData[196:200]))
 	}
 }

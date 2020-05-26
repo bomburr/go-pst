@@ -2,7 +2,9 @@
 // Copyright (C) 2020 Marten Mooij (https://www.mooijtech.com/)
 package main
 
-import "log"
+import (
+	"log"
+)
 
 func main() {
 	pstFile := NewPSTFile("/home/bot/Documents/test.pst")
@@ -10,13 +12,13 @@ func main() {
 	log.Printf("Starting go-pst v%s...", version)
 	log.Printf("Using file: %s...", pstFile.Path)
 
-	fileHeader := pstFile.ReadHeader()
+	fileHeader := pstFile.GetHeader()
 
 	if !pstFile.IsValidSignature(fileHeader) {
 		log.Fatalf("Invalid file signature!")
 	}
 
-	fileContentType := pstFile.ReadContentType(fileHeader)
+	fileContentType := pstFile.GetContentType(fileHeader)
 
 	if fileContentType == ContentTypePST {
 		log.Println("Identified content type as Personal Storage Table (PST).")
@@ -28,7 +30,7 @@ func main() {
 		log.Fatalf("Failed to identify content type.")
 	}
 
-	fileFormatType := pstFile.ReadFormatType(fileHeader)
+	fileFormatType := pstFile.GetFormatType(fileHeader)
 
 	if fileFormatType == FormatType64 {
 		log.Println("Identified format type as 64-bit (Unicode).")
@@ -38,8 +40,8 @@ func main() {
 		log.Fatalf("Failed to identify format type.")
 	}
 
-	fileHeaderData := pstFile.ReadHeaderData(fileFormatType)
-	fileEncryptionType := pstFile.ReadEncryptionType(fileHeaderData)
+	fileHeaderData := pstFile.GetHeaderData(fileFormatType)
+	fileEncryptionType := pstFile.GetEncryptionType(fileHeaderData)
 
 	if fileEncryptionType == EncryptionTypeNone {
 		log.Println("Identified encryption type as none.")
@@ -50,4 +52,8 @@ func main() {
 	} else {
 		log.Fatal("Failed to identify encryption type.")
 	}
+
+	fileBTreeStartOffset := pstFile.GetBTreeStartOffset(fileHeaderData)
+
+	log.Printf("Walking b-tree at start offset: %d...", fileBTreeStartOffset)
 }
