@@ -15,8 +15,11 @@
   <a href="https://github.com/mooijtech/go-pst">
     <img src="https://img.shields.io/badge/version-0.0.1-4D7CFE?style=flat-square">
   </a>
+  <a href="https://travis-ci.org/github/mooijtech/go-pst">
+    <img src="https://travis-ci.org/mooijtech/go-pst.svg?branch=master">
+  </a>
   <a href="https://github.com/mooijtech/go-pst">
-      <img src="https://img.shields.io/badge/contributions-welcome-DE911D?style=flat-square">
+      <img src="https://img.shields.io/badge/contributions-welcome-9446ED?style=flat-square">
   </a>
 </p>
 
