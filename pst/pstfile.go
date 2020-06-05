@@ -1,6 +1,6 @@
-// This file is part of go-pst (https://github.com/mooijtech/go-pst)
+// This file is part of go-pst (https://www.go-pst.org/)
 // Copyright (C) 2020 Marten Mooij (https://www.mooijtech.com/)
-package main
+package pst
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ type PSTFile struct {
 
 // Constructor for creating PST files.
 func NewPSTFile(pstFilePath string) PSTFile {
-	return PSTFile {
+	return PSTFile{
 		Path: pstFilePath,
 	}
 }
@@ -144,4 +144,13 @@ func (pstFile *PSTFile) GetBTreeStartOffset(fileHeaderData []byte) int {
 	} else {
 		return int(binary.LittleEndian.Uint32(fileHeaderData[196:200]))
 	}
+}
+
+// Walks the b-tree at the given index.
+// Returns th
+func (pstFile *PSTFile) FindBTreeItem() {
+	// The 64-bit/32-bit page is 512 bytes of size.
+	pageSize := 496
+
+
 }

@@ -1,13 +1,13 @@
-// This file is part of go-pst (https://github.com/mooijtech/go-pst)
+// This file is part of go-pst (https://www.go-pst.org/)
 // Copyright (C) 2020 Marten Mooij (https://www.mooijtech.com/)
-package main
+package pst
 
 import (
 	"log"
 )
 
-func main() {
-	pstFile := NewPSTFile("/home/bot/Documents/test.pst")
+func ParseFile(path string) {
+	pstFile := NewPSTFile(path)
 
 	log.Printf("Starting go-pst v%s...", version)
 	log.Printf("Using file: %s...", pstFile.Path)
