@@ -3,57 +3,57 @@
 package pst
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 func ParseFile(path string) {
 	pstFile := NewPSTFile(path)
 
-	log.Printf("Starting go-pst v%s...", version)
-	log.Printf("Using file: %s...", pstFile.Path)
+	log.Infof("Starting go-pst v%s...", version)
+	log.Infof("Using file: %s...", pstFile.Path)
 
 	fileHeader := pstFile.GetHeader()
 
 	if !pstFile.IsValidSignature(fileHeader) {
-		log.Fatalf("Invalid file signature!")
+		log.Fatal("Invalid file signature!")
 	}
 
 	fileContentType := pstFile.GetContentType(fileHeader)
 
 	if fileContentType == ContentTypePST {
-		log.Println("Identified content type as Personal Storage Table (PST).")
+		log.Info("Identified content type as Personal Storage Table (PST).")
 	} else if fileContentType == ContentTypeOST {
-		log.Println("Identified content type as Offline Storage Table (OST).")
+		log.Info("Identified content type as Offline Storage Table (OST).")
 	} else if fileContentType == ContentTypePAB {
-		log.Println("Identified content type as Public Address Book (PAB).")
+		log.Info("Identified content type as Public Address Book (PAB).")
 	} else {
-		log.Fatalf("Failed to identify content type.")
+		log.Info("Failed to identify content type.")
 	}
 
 	fileFormatType := pstFile.GetFormatType(fileHeader)
 
 	if fileFormatType == FormatType64 {
-		log.Println("Identified format type as 64-bit (Unicode).")
+		log.Info("Identified format type as 64-bit (Unicode).")
 	} else if fileFormatType == FormatType32 {
-		log.Println("Identified format type as 32-bit (ANSI).")
+		log.Info("Identified format type as 32-bit (ANSI).")
 	} else {
-		log.Fatalf("Failed to identify format type.")
+		log.Fatal("Failed to identify format type.")
 	}
 
 	fileHeaderData := pstFile.GetHeaderData(fileFormatType)
 	fileEncryptionType := pstFile.GetEncryptionType(fileHeaderData)
 
 	if fileEncryptionType == EncryptionTypeNone {
-		log.Println("Identified encryption type as none.")
+		log.Info("Identified encryption type as none.")
 	} else if fileEncryptionType == EncryptionTypePermute {
-		log.Println("Identified encryption type as permute.")
+		log.Info("Identified encryption type as permute.")
 	} else if fileEncryptionType == EncryptionTypeCyclic {
-		log.Println("Identified encryption type as cyclic.")
+		log.Info("Identified encryption type as cyclic.")
 	} else {
 		log.Fatal("Failed to identify encryption type.")
 	}
 
 	fileBTreeStartOffset := pstFile.GetBTreeStartOffset(fileHeaderData)
 
-	log.Printf("Walking b-tree at start offset: %d...", fileBTreeStartOffset)
+	log.Infof("Walking b-tree at start offset: %d...", fileBTreeStartOffset)
 }
