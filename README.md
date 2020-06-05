@@ -1,12 +1,12 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/mooijtech/go-pst"><img src="https://i.imgur.com/qE8QsP6.png" alt="go-pst" width="320"></a>
+  <a href="https://github.com/mooijtech/go-pst"><img src="https://www.go-pst.org/assets/images/logo.svg" alt="go-pst" width="369"></a>
   <br>
   go-pst
   <br>
 </h1>
 
-<h4 align="center">A fast library for reading PFF/OFF/PST/OST/PAB files in Go (Golang).</h4>
+<h4 align="center">A fast library for reading PST, OST and PAB files in Go (Golang).</h4>
 
 <p align="center">
   <a href="https://github.com/mooijtech/go-pst/blob/master/LICENSE.txt" target="_blank">
@@ -26,8 +26,41 @@
 ---
 
 #### This library doesn't work yet.
+
 The PFF (Personal Folder File) and OFF (Offline Folder File) format is used to store Microsoft Outlook e-mails, appointments and contacts. 
 The PST (Personal Storage Table), OST (Offline Storage Table) and PAB (Personal Address Book) file format consist of the PFF format.
+
+## Goals
+
+- Support PST, OST and PAB files
+- Provide a reliable built-in parser 
+- Be asynchronous and event-driven
+- Have a well documented API
+- Understand encrypted files 
+  - On by default with newer versions of Outlook
+- Extract as much data as possible
+- Quickly retrieve messages by their identifiers
+- Flexible storage system
+- Learn a lot and have fun
+
+## Usage
+
+```bash
+```
+
+## Example
+
+```go
+```
+
+## Documentation
+
+- [go-pst API]()
+- [File format specification](https://github.com/mooijtech/go-pst/tree/master/docs)
+
+## Motivation
+
+[Mooij Forensics](https://www.mooijforensics.com/) allows you to analyse and present digital evidence.
 
 ## Versioning
 
@@ -47,10 +80,6 @@ For more information on SemVer, please visit: https://semver.org/
 ## Issues
 
 Feel free to submit any issues or feature requests [here](https://github.com/mooijtech/go-pst/issues).
-
-## Documentation
-
-[File format specification](https://github.com/mooijtech/go-pst/tree/master/docs)
 
 ## References
 
