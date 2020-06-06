@@ -17,10 +17,14 @@ func main() {
 
 	flag.Parse()
 
-	if _, err := os.Stat(*inputFile); os.IsNotExist(err) {
+	// Input validation
+	if *inputFile == "" {
+		log.Fatal("Please specify a file path with the \"-parse\" flag.")
+	} else if _, err := os.Stat(*inputFile); os.IsNotExist(err) {
 		log.Fatal("The specified file path does not exist.")
 	}
 
+	// Set logging level
 	switch *logLevel {
 	case "info":
 		log.SetLevel(log.InfoLevel)
@@ -39,6 +43,7 @@ func main() {
 	}
 
 	log.Infof("Starting go-pst v%s...", pst.Version)
-	
+	log.Infof("Using logging level: %s...", log.GetLevel().String())
+
 	pst.ParseFile(*inputFile)
 }

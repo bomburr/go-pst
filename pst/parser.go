@@ -6,18 +6,24 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Parses the given file
 func ParseFile(path string) {
 	pstFile := NewPSTFile(path)
 
-	log.Infof("Starting go-pst v%s...", version)
 	log.Infof("Using file: %s...", pstFile.Path)
 
-	fileHeader := pstFile.GetHeader()
+	// Get the file header
+	fileHeader, err := pstFile.GetHeader()
 
-	if !pstFile.IsValidSignature(fileHeader) {
-		log.Fatal("Invalid file signature!")
+	if err != nil {
+		log.Fatalf("Failed to get file header: %s", err)
 	}
 
+	if !pstFile.IsValidSignature(fileHeader) {
+		log.Fatal("Invalid file signature.")
+	}
+
+	// Get the content type
 	fileContentType := pstFile.GetContentType(fileHeader)
 
 	if fileContentType == ContentTypePST {
@@ -30,7 +36,12 @@ func ParseFile(path string) {
 		log.Info("Failed to identify content type.")
 	}
 
-	fileFormatType := pstFile.GetFormatType(fileHeader)
+	// Get the format type
+	fileFormatType, err := pstFile.GetFormatType(fileHeader)
+
+	if err != nil {
+		log.Fatalf("Failed to get format type: %s", err)
+	}
 
 	if fileFormatType == FormatType64 {
 		log.Info("Identified format type as 64-bit (Unicode).")
@@ -40,8 +51,19 @@ func ParseFile(path string) {
 		log.Fatal("Failed to identify format type.")
 	}
 
-	fileHeaderData := pstFile.GetHeaderData(fileFormatType)
-	fileEncryptionType := pstFile.GetEncryptionType(fileHeaderData)
+	// Get the file header data
+	fileHeaderData, err := pstFile.GetHeaderData(fileFormatType)
+
+	if err != nil {
+		log.Fatalf("Failed to get header data: %s", err)
+	}
+
+	// Get file encryption type
+	fileEncryptionType, err := pstFile.GetEncryptionType(fileHeaderData, fileFormatType)
+
+	if err != nil {
+		log.Fatalf("Failed to get encryption type: %s", err)
+	}
 
 	if fileEncryptionType == EncryptionTypeNone {
 		log.Info("Identified encryption type as none.")
@@ -53,7 +75,12 @@ func ParseFile(path string) {
 		log.Fatal("Failed to identify encryption type.")
 	}
 
-	fileBTreeStartOffset := pstFile.GetBTreeStartOffset(fileHeaderData)
+	// Walk the B-Tree
+	fileBTreeStartOffset, err := pstFile.GetBTreeStartOffset(fileHeaderData, fileFormatType)
+
+	if err != nil {
+		log.Fatalf("Failed to get b-tree start offset: %s", err)
+	}
 
 	log.Infof("Walking b-tree at start offset: %d...", fileBTreeStartOffset)
 }
