@@ -2,5 +2,5 @@
 // Copyright (C) 2020 Marten Mooij (https://www.mooijtech.com/)
 package pst
 
-// Keeps track of the current version of go-pst.
-const version = "0.0.1"
+// Keeps track of the current version of go-pst
+const Version = "0.0.1"
