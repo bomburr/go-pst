@@ -6,77 +6,98 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"os"
 )
 
-// This struct represents a PST file.
+// ParsableFile represents a PST file.
 type ParsableFile struct {
 	Path string
 }
 
-// Constructor for creating PST files.
+// NewPSTFile is a constructor for creating PST files.
 func NewPSTFile(pstFilePath string) ParsableFile {
 	return ParsableFile{
 		Path: pstFilePath,
 	}
 }
 
-// The file header common to both the 32-bit and 64-bit PFF format consists of 24 bytes.
-func (pstFile *ParsableFile) GetHeader() ([]byte, error) {
-	inputFile, err := os.Open(pstFile.Path)
+// Read reads the parsable file into the specified buffer.
+func (parsableFile *ParsableFile) Read(outputBufferSize int, offset int) ([]byte, error) {
+	inputFile, err := os.Open(parsableFile.Path)
 
 	if err != nil {
-		log.Errorf("Failed to open file: %s", pstFile.Path)
 		return nil, err
 	}
 
-	outputBuffer := make([]byte, 24)
-	count, err := inputFile.Read(outputBuffer)
+	outputBuffer := make([]byte, outputBufferSize)
+
+	_, err = inputFile.Seek(int64(offset), 0)
 
 	if err != nil {
-		log.Errorf("Failed to read file (%d of 24 bytes read).", count)
+		return nil, err
+	}
+
+	_, err = inputFile.Read(outputBuffer)
+
+	if err != nil {
 		return nil, err
 	}
 
 	if err := inputFile.Close(); err != nil {
-		log.Errorf("Failed to close file: %s", err)
 		return nil, err
 	}
 
 	return outputBuffer, nil
 }
 
-// The first 4 bytes of the file header contain the unique signature "!BDN" signifying the PFF format.
-func (pstFile *ParsableFile) IsValidSignature(fileHeader []byte) bool {
+// GetHeader returns the file header.
+// References "2. File header".
+func (parsableFile *ParsableFile) GetHeader() ([]byte, error) {
+	return parsableFile.Read(24, 0)
+}
+
+// IsValidSignature checks if the file header contains the unique signature "!BDN".
+// References "2. File header".
+func (parsableFile *ParsableFile) IsValidSignature(fileHeader []byte) bool {
 	return bytes.HasPrefix(fileHeader, []byte("!BDN"))
 }
 
 // Constants for identifying content types (PST, OST or PAB).
+// References "2.1. Content types".
 const (
-	ContentTypePST = "SM"
-	ContentTypeOST = "SO"
-	ContentTypePAB = "AB"
+	ContentTypePST = "PST"
+	ContentTypeOST = "PST"
+	ContentTypePAB = "PAB"
 )
 
-// The 9th and 10th byte of the file header contains the content type.
-// The content type signifies if the file contains the PST, OST or PAB format.
-func (pstFile *ParsableFile) GetContentType(fileHeader []byte) string {
-	return string(fileHeader[8:10])
+// GetContentType returns the content type which may be PST, OST or PAB.
+// References "2. File header".
+func (parsableFile *ParsableFile) GetContentType(fileHeader []byte) (string, error) {
+	contentType := fileHeader[8:10]
+
+	if bytes.Equal(contentType, []byte("SM")) {
+		return ContentTypePST, nil
+	} else if bytes.Equal(contentType, []byte("SO")) {
+		return ContentTypeOST, nil
+	} else if bytes.Equal(contentType, []byte("AB")) {
+		return ContentTypePAB, nil
+	} else {
+		return "", errors.New("failed to get content type")
+	}
 }
 
 // Constants for identifying format types (32-bit or 64-bit).
 const (
-	FormatType32 = "32"
-	FormatType64 = "64"
+	FormatType32 = "32-bit"
+	FormatType64 = "64-bit"
+	FormatType64With4k = "64-bit-with-4k"
 )
 
-// The 11th and 12th byte of the file header contains the format type.
-// This can be either 32-bit (ANSI) or 64-bit (Unicode).
-func (pstFile *ParsableFile) GetFormatType(fileHeader []byte) (string, error) {
+// GetFormatType returns the format type which can be either 32-bit (ANSI) or 64-bit (Unicode).
+// References "2. File header" and "2.2. Format types".
+func (parsableFile *ParsableFile) GetFormatType(fileHeader []byte) (string, error) {
 	formatType := fileHeader[10:12]
 
-	// References "2.2. Format types" from the file format specification
 	if bytes.Equal(formatType, []byte{14, 0}) {
 		return FormatType32, nil
 	} else if bytes.Equal(formatType, []byte{15, 0}) {
@@ -86,22 +107,15 @@ func (pstFile *ParsableFile) GetFormatType(fileHeader []byte) (string, error) {
 	} else if bytes.Equal(formatType, []byte{23, 0}) {
 		return FormatType64, nil
 	} else if bytes.Equal(formatType, []byte{36, 0}) {
-		return FormatType64, nil
+		return FormatType64With4k, nil
 	} else {
 		return "", errors.New("failed to get format type")
 	}
 }
 
-// The file header data bytes size may be 540 (64-bit) or 488 (32-bit).
-func (pstFile *ParsableFile) GetHeaderData(formatType string) ([]byte, error) {
-	inputFile, err := os.Open(pstFile.Path)
-
-	if err != nil {
-		log.Errorf("Failed to open file: %s", pstFile.Path)
-		return nil, err
-	}
-
-	// File header output buffer
+// GetHeaderData returns the file header data (in bytes).
+// References "2.3. The 32-bit header data" and "2.4. The 64-bit header data".
+func (parsableFile *ParsableFile) GetHeaderData(formatType string) ([]byte, error) {
 	var outputBufferSize int
 
 	if formatType == FormatType64 {
@@ -112,20 +126,7 @@ func (pstFile *ParsableFile) GetHeaderData(formatType string) ([]byte, error) {
 		return nil, errors.New("unsupported format type")
 	}
 
-	outputBuffer := make([]byte, outputBufferSize)
-	count, err := inputFile.Read(outputBuffer)
-
-	if err != nil {
-		log.Errorf("Failed to read file (%d of %d bytes read).", count, outputBufferSize)
-		return nil, err
-	}
-
-	if err := inputFile.Close(); err != nil {
-		log.Errorf("Failed to close file: %s", err)
-		return nil, err
-	}
-
-	return outputBuffer, nil
+	return parsableFile.Read(outputBufferSize, 0)
 }
 
 // Constants for identifying encryption types.
@@ -135,9 +136,10 @@ const (
 	EncryptionTypeCyclic = "cyclic"
 )
 
-// Reads the encryption type.
+// GetEncryptionType returns the encryption type.
 // Compressible encryption (permute) is on by default with newer versions of Outlook.
-func (pstFile *ParsableFile) GetEncryptionType(fileHeaderData []byte, formatType string) (string, error) {
+// References "2.3. The 32-bit header data", "2.4. The 64-bit header data" and "2.7. Encryption types".
+func (parsableFile *ParsableFile) GetEncryptionType(fileHeaderData []byte, formatType string) (string, error) {
 	var encryptionType []byte
 
 	if formatType == FormatType64 {
@@ -159,8 +161,9 @@ func (pstFile *ParsableFile) GetEncryptionType(fileHeaderData []byte, formatType
 	}
 }
 
-// Returns the offset where the b-tree starts.
-func (pstFile *ParsableFile) GetBTreeStartOffset(fileHeaderData []byte, formatType string) (int, error) {
+// GetBTreeStartOffset returns the start offset of the b-tree.
+// References "2.3. The 32-bit header data" and "2.4. The 64-bit header data".
+func (parsableFile *ParsableFile) GetBTreeStartOffset(fileHeaderData []byte, formatType string) (int, error) {
 	if formatType == FormatType64 {
 		return int(binary.LittleEndian.Uint64(fileHeaderData[240:248])), nil
 	} else if formatType == FormatType32 {

@@ -1,7 +1,5 @@
 // This file is part of go-pst (https://www.go-pst.org/)
 // Copyright (C) 2020 Marten Mooij (https://www.mooijtech.com/)
-//
-// Command line interface for go-pst
 package main
 
 import (

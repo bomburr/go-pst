@@ -24,7 +24,11 @@ func ParseFile(path string) {
 	}
 
 	// Get the content type
-	fileContentType := pstFile.GetContentType(fileHeader)
+	fileContentType, err := pstFile.GetContentType(fileHeader)
+
+	if err != nil {
+		log.Fatalf("Failed to get content type: %s", err)
+	}
 
 	if fileContentType == ContentTypePST {
 		log.Info("Identified content type as Personal Storage Table (PST).")
@@ -32,8 +36,6 @@ func ParseFile(path string) {
 		log.Info("Identified content type as Offline Storage Table (OST).")
 	} else if fileContentType == ContentTypePAB {
 		log.Info("Identified content type as Public Address Book (PAB).")
-	} else {
-		log.Info("Failed to identify content type.")
 	}
 
 	// Get the format type
@@ -45,10 +47,10 @@ func ParseFile(path string) {
 
 	if fileFormatType == FormatType64 {
 		log.Info("Identified format type as 64-bit (Unicode).")
+	} else if fileFormatType == FormatType64With4k {
+		log.Info("Identified format type as 64-bit with 4k pages.")
 	} else if fileFormatType == FormatType32 {
 		log.Info("Identified format type as 32-bit (ANSI).")
-	} else {
-		log.Fatal("Failed to identify format type.")
 	}
 
 	// Get the file header data
@@ -71,8 +73,6 @@ func ParseFile(path string) {
 		log.Info("Identified encryption type as permute.")
 	} else if fileEncryptionType == EncryptionTypeCyclic {
 		log.Info("Identified encryption type as cyclic.")
-	} else {
-		log.Fatal("Failed to identify encryption type.")
 	}
 
 	// Walk the B-Tree
